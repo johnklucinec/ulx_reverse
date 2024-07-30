@@ -1,0 +1,44 @@
+Bus 001 Device 005: ID 361d:0100 Finalmouse UltralightX dongle
+
+ bMaxPacketSize0        64
+  idVendor           0x361d Finalmouse
+  idProduct          0x0100 UltralightX dongle
+
+Endpoint Descriptor:
+    bLength                 7
+    bDescriptorType         5
+    bEndpointAddress     0x81  EP 1 IN
+    bmAttributes            3
+        Transfer Type            Interrupt
+        Synch Type               None
+        Usage Type               Data
+    wMaxPacketSize     0x0040  1x 64 bytes
+    bInterval               1
+Endpoint Descriptor:
+    bLength                 7
+    bDescriptorType         5
+    bEndpointAddress     0x01  EP 1 OUT
+    bmAttributes            3
+        Transfer Type            Interrupt
+        Synch Type               None
+        Usage Type               Data
+    wMaxPacketSize     0x0040  1x 6
+
+383-390: Set Motion Sync On.
+
+Out 1:
+0000   04 03 92 01 01 00 00 00 00 00 00 00 00 00 00 00
+Out 2:
+0000   05 03 12 01 00 00 00 00 00 00 00 00 00 00 00 00
+Out 3:
+0000   05 03 12 01 01 00 00 00 00 00 00 00 00 00 00 00
+
+435-446: Set Motion Sync Off.
+Out 1:
+0000   04 03 92 01 00 00 00 00 00 00 00 00 00 00 00 00
+Out 2:
+0000   05 03 12 01 01 00 00 00 00 00 00 00 00 00 00 00
+Out 3:
+0040   05 03 12 01 00 00 00 00 00 00 00 00 00 00 00 00
+
+https://youtu.be/is9wVOKeIjQ?t=4649
