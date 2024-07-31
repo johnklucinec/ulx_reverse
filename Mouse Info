@@ -25,7 +25,6 @@ Endpoint Descriptor:
     wMaxPacketSize     0x0040  1x 6
 
 383-390: Set Motion Sync On.
-
 Out 1:
 0000   04 03 92 01 01 00 00 00 00 00 00 00 00 00 00 00
 Out 2:
