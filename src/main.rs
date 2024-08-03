@@ -1,14 +1,17 @@
-use rusb::{Context, Device, DeviceHandle, Error, UsbContext};
+use rusb::{
+    Context, Device, DeviceHandle, EndpointDescriptors, Error, Interface, InterfaceDescriptors,
+    UsbContext,
+};
 use tokio;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let context = Context::new()?;
-    //const VID: u16 = 0x361d; // Finalmouse
-    //const PID: u16 = 0x0100; // UltralightX dongle
+    const VID: u16 = 0x361d; // Finalmouse
+    const PID: u16 = 0x0100; // UltralightX dongle
 
-    const VID: u16 = 0x3151; // Monsgeek
-    const PID: u16 = 0x4015; // Keyboard?
+    const COMMAND_ENDPOINT: u8 = 0x01;
+    const INTERRUPT_ENDPOINT: u8 = 0x81;
 
     // Find the device
     let device = context.devices()?.iter().find(|device| {
@@ -20,25 +23,31 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Some(device) => {
             println!("Device found: {:?}", device);
 
-            let mut handle = match device.open() {
-                Ok(handle) => {
-                    println!("Device opened");
-                    handle
+            let mut handle = device
+                .open()
+                .map_err(|e| Box::new(e) as Box<dyn std::error::Error + 'static>)?;
+            println!("Device opened");
+
+            let config_descriptor = device.active_config_descriptor();
+
+            for interface in config_descriptor {
+                for descriptor in interface.interfaces() {
+                    let mut endpoints = descriptor.descriptors();
+                    let control_interface_opt =
+                        endpoints.find(|endpoint| endpoint.sub_class_code() == 1);
+
+                    if let Some(control_interface) = control_interface_opt {
+                        let _command_endpoint = control_interface
+                            .endpoint_descriptors()
+                            .find(|ep| ep.address() == COMMAND_ENDPOINT);
+
+                        let _command_endpoint = control_interface
+                            .endpoint_descriptors()
+                            .find(|ep| ep.address() == INTERRUPT_ENDPOINT);
+                    } else {
+                        println!("Control interface not found");
+                    }
                 }
-                Err(e) => return Err(Box::new(e) as Box<dyn std::error::Error + 'static>),
-            };
-
-            // Claim the first interface
-            let interface_number = 0;
-            if let Err(e) = handle.claim_interface(interface_number) {
-                eprintln!("Failed to claim interface {}: {}", interface_number, e);
-                return Err(Box::new(e) as Box<dyn std::error::Error + 'static>);
-            }
-
-            // Release the interface
-            if let Err(e) = handle.release_interface(interface_number) {
-                eprintln!("Failed to release interface {}: {}", interface_number, e);
-                return Err(Box::new(e) as Box<dyn std::error::Error + 'static>);
             }
         }
         None => {
