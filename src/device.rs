@@ -33,6 +33,91 @@ impl DeviceInfo {
 
         Ok(())
     }
+
+    pub fn set_dpi(&mut self, dpi: DpiOptions) -> Result<(), Box<dyn std::error::Error>> {
+        let mut command: Vec<u8> = vec![0u8; 64];
+
+        command[0] = 0x04;
+        command[1] = 0x04;
+        command[2] = 0x90;
+        command[3] = 0x02;
+
+        match dpi {
+            DpiOptions::Dpi400 => {
+                command[4] = 0x90;
+                command[5] = 0x01;
+            }
+            DpiOptions::Dpi800 => {
+                command[4] = 0x20;
+                command[5] = 0x03;
+            }
+            DpiOptions::Dpi1600 => {
+                command[4] = 0x40;
+                command[5] = 0x06;
+            }
+            DpiOptions::Dpi3200 => {
+                command[4] = 0x80;
+                command[5] = 0x0c;
+            }
+            DpiOptions::Dpi6400 => {
+                command[4] = 0x00;
+                command[5] = 0x19;
+            }
+        }
+
+        // Attempt to process the command
+        if let Err(e) = process_command(self, &command) {
+            eprintln!("Failed to process command: {}", e);
+            return Err(e);
+        }
+
+        // Update the current settings if the command was successful
+        self.current_settings.dpi = dpi;
+
+        Ok(())
+    }
+
+    pub fn set_polling_rate(
+        &mut self,
+        polling_rate: PollingOptions,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let mut command: Vec<u8> = vec![0u8; 64];
+
+        command[0] = 0x04;
+        command[1] = 0x04;
+        command[2] = 0x90;
+        command[3] = 0x02;
+
+        match polling_rate {
+            PollingOptions::Poll500 => {
+                command[4] = 0x90;
+                command[5] = 0x01;
+            }
+            PollingOptions::Poll1000 => {
+                command[4] = 0x20;
+                command[5] = 0x03;
+            }
+            PollingOptions::Poll2000 => {
+                command[4] = 0x40;
+                command[5] = 0x06;
+            }
+            PollingOptions::Poll4000 => {
+                command[4] = 0x80;
+                command[5] = 0x0c;
+            }
+        }
+
+        // Attempt to process the command
+        if let Err(e) = process_command(self, &command) {
+            eprintln!("Failed to process command: {}", e);
+            return Err(e);
+        }
+
+        // Update the current settings if the command was successful
+        self.current_settings.polling_rate = polling_rate;
+
+        Ok(())
+    }
 }
 
 pub fn initialize_device_info(context: &Context) -> Result<DeviceInfo, Box<dyn std::error::Error>> {

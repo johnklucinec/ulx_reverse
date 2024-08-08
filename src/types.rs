@@ -12,6 +12,7 @@ pub enum DpiOptions {
     Dpi6400 = 6400,
 }
 
+#[derive(PartialEq)]
 pub enum PollingOptions {
     Poll500 = 500,
     Poll1000 = 1000,
