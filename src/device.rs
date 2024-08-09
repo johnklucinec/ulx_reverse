@@ -85,25 +85,25 @@ impl DeviceInfo {
 
         command[0] = 0x04;
         command[1] = 0x04;
-        command[2] = 0x90;
+        command[2] = 0x91;
         command[3] = 0x02;
 
         match polling_rate {
             PollingOptions::Poll500 => {
-                command[4] = 0x90;
+                command[4] = 0xf4;
                 command[5] = 0x01;
             }
             PollingOptions::Poll1000 => {
-                command[4] = 0x20;
+                command[4] = 0xe8;
                 command[5] = 0x03;
             }
             PollingOptions::Poll2000 => {
-                command[4] = 0x40;
-                command[5] = 0x06;
+                command[4] = 0xd0;
+                command[5] = 0x07;
             }
             PollingOptions::Poll4000 => {
-                command[4] = 0x80;
-                command[5] = 0x0c;
+                command[4] = 0xa0;
+                command[5] = 0x0f;
             }
         }
 
@@ -115,6 +115,70 @@ impl DeviceInfo {
 
         // Update the current settings if the command was successful
         self.current_settings.polling_rate = polling_rate;
+
+        Ok(())
+    }
+
+    pub fn set_lod(&mut self, lod: LodOptions) -> Result<(), Box<dyn std::error::Error>> {
+        let mut command: Vec<u8> = vec![0u8; 64];
+
+        command[0] = 0x04;
+        command[1] = 0x03;
+        command[2] = 0x95;
+        command[3] = 0x01;
+
+        match lod {
+            LodOptions::Lod1 => {
+                command[4] = 0x01;
+            }
+            LodOptions::Lod2 => {
+                command[4] = 0x02;
+            }
+        }
+
+        // Attempt to process the command
+        if let Err(e) = process_command(self, &command) {
+            eprintln!("Failed to process command: {}", e);
+            return Err(e);
+        }
+
+        // Update the current settings if the command was successful
+        self.current_settings.lod = lod;
+
+        Ok(())
+    }
+
+    pub fn set_dongle_led(
+        &mut self,
+        led_option: DongleLedOptions,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let mut command: Vec<u8> = vec![0u8; 64];
+
+        command[0] = 0x04;
+        command[1] = 0x03;
+        command[2] = 0x94;
+        command[3] = 0x01;
+
+        match led_option {
+            DongleLedOptions::LedOff => {
+                command[4] = 0x00;
+            }
+            DongleLedOptions::LedBattery => {
+                command[4] = 0x01;
+            }
+            DongleLedOptions::LedWhite => {
+                command[4] = 0x02;
+            }
+        }
+
+        // Attempt to process the command
+        if let Err(e) = process_command(self, &command) {
+            eprintln!("Failed to process command: {}", e);
+            return Err(e);
+        }
+
+        // Update the current settings if the command was successful
+        self.current_settings.dongle_led = led_option;
 
         Ok(())
     }
