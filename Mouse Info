@@ -63,78 +63,39 @@ OFF:    04 03 94 01 00 00 00 00 00 00 00 00 00 00 00 00
 Batt:   04 03 94 01 01 00 00 00 00 00 00 00 00 00 00 00
 White:  04 03 94 01 02 00 00 00 00 00 00 00 00 00 00 00
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-435-446: Set Motion Sync Off.
-
 https://youtu.be/is9wVOKeIjQ?t=5615
 
+Idea for saving settings:
 
+fn binary_to_hex(binary: u32) -> String {
+    format!("{:X}", binary)
+}
 
+fn hex_to_binary(hex: &str) -> Result<u32, std::num::ParseIntError> {
+    u32::from_str_radix(hex, 16)
+}
 
-    // let config_descriptor = device.active_config_descriptor();
+fn main() {
+    // Example 1: Binary to Hex
+    let binary_number: u32 = 0b1101_1001; // Binary literal: 217 in decimal
+    let hex_result = binary_to_hex(binary_number);
+    println!("Binary {:032b} is hex {}", binary_number, hex_result);
 
-    // config_descriptor.into_iter().for_each(|interface| {
-    //     for descriptor in interface.interfaces() {
-    //         let mut endpoints = descriptor.descriptors();
-    //         let control_interface_opt = endpoints.find(|endpoint| endpoint.sub_class_code() == 1);
-
-    //         if let Some(control_interface) = control_interface_opt {
-    //             let _command_endpoint = control_interface
-    //                 .endpoint_descriptors()
-    //                 .find(|ep| ep.address() == COMMAND_ENDPOINT);
-
-    //             println!("{:?}", _command_endpoint);
-
-    //             let _command_endpoint = control_interface
-    //                 .endpoint_descriptors()
-    //                 .find(|ep| ep.address() == INTERRUPT_ENDPOINT);
-
-    //             println!("{:?}", _command_endpoint);
-    //         } else {
-    //             println!("Control interface not found");
-    //         }
-    //     }
-    //});
-
-
-better Error handling?
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let context = match Context::new() {
-        Ok(ctx) => ctx,
-        Err(e) => {
-            eprintln!("Failed to create USB context: {}", e);
-            return Err(e.into());
-        }
-    };
-
-    // Initialize DeviceInfo
-    let mut device_info = match initialize_device_info(&context) {
-        Ok(info) => info,
-        Err(e) => {
-            eprintln!("Failed to initialize device info: {}", e);
-            return Err(e);
-        }
-    };
-
-    // Set Motion Sync
-    if let Err(e) = device_info.set_motion_sync(false) {
-        eprintln!("Failed to set motion sync: {}", e);
-        return Err(e);
+    // Example 2: Hex to Binary
+    let hex_string = "D9"; // 217 in hexadecimal
+    match hex_to_binary(hex_string) {
+        Ok(binary) => println!("Hex {} is binary {:032b}", hex_string, binary),
+        Err(e) => println!("Error converting hex to binary: {}", e),
     }
 
-    Ok(())
+    // Example 3: Invalid hex string
+    let invalid_hex = "G9"; // Invalid hexadecimal
+    match hex_to_binary(invalid_hex) {
+        Ok(binary) => println!("Hex {} is binary {:032b}", invalid_hex, binary),
+        Err(e) => println!("Error converting hex to binary: {}", e),
+    }
 }
+
+
+
+
