@@ -67,14 +67,6 @@ https://youtu.be/is9wVOKeIjQ?t=5615
 
 Idea for saving settings:
 
-fn binary_to_hex(binary: u32) -> String {
-    format!("{:X}", binary)
-}
-
-fn hex_to_binary(hex: &str) -> Result<u32, std::num::ParseIntError> {
-    u32::from_str_radix(hex, 16)
-}
-
 fn main() {
     // Example 1: Binary to Hex
     let binary_number: u32 = 0b1101_1001; // Binary literal: 217 in decimal
@@ -96,6 +88,10 @@ fn main() {
     }
 }
 
+fn main() {
+    let input = 0b10000000000110000; // Example input
+    let settings = parse_settings(input);
+}
 
 
 
