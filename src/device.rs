@@ -10,7 +10,10 @@ pub struct DeviceInfo {
 }
 
 impl DeviceInfo {
-    pub fn set_motion_sync(&mut self, motion_sync: bool) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn set_motion_sync(
+        &mut self,
+        motion_sync: MotionSyncOptions,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let mut command: Vec<u8> = vec![0u8; 64];
 
         command[0] = 0x04;
@@ -18,7 +21,7 @@ impl DeviceInfo {
         command[2] = 0x92;
         command[3] = 0x01;
 
-        if motion_sync {
+        if motion_sync == MotionSyncOptions::SyncOn {
             command[4] = 0x01; // This byte turns on Motion Sync
         }
 
@@ -198,7 +201,7 @@ pub fn initialize_device_info(context: &Context) -> Result<DeviceInfo, Box<dyn s
     let current_settings = CurrentSettings {
         dpi: DpiOptions::Dpi1600,
         polling_rate: PollingOptions::Poll4000,
-        motion_sync: false,
+        motion_sync: MotionSyncOptions::SyncOff,
         lod: LodOptions::Lod1,
         dongle_led: DongleLedOptions::LedBattery,
     };
