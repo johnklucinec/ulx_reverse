@@ -19,18 +19,19 @@ pub fn process_command(
                 device_info
                     .handle
                     .detach_kernel_driver(device_info.interface_number)?;
-                println!("Kernel driver detached successfully");
+                eprintln!("Kernel driver detached successfully");
 
                 device_info
                     .handle
                     .claim_interface(device_info.interface_number)?;
 
                 send_command(&device_info.handle, command)?;
-                println!("Command sent successfully");
+                eprintln!("Command sent successfully");
 
                 device_info
                     .handle
                     .release_interface(device_info.interface_number)?;
+
                 device_info
                     .handle
                     .attach_kernel_driver(device_info.interface_number)?;
