@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 rusb = "0.9.4"
-tokio = { version = "1", features = ["full"] }
+strum_macros = "0.26.4"
 
 [[bin]]
 name = "ulx_reverse"
