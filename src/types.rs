@@ -1,6 +1,4 @@
-use std::fmt;
 use strum_macros::FromRepr;
-
 use crate::utils::extract_bits;
 
 pub const VID: u16 = 0x361d;
@@ -96,8 +94,8 @@ impl CurrentSettings {
     }
 }
 
-impl fmt::Display for CurrentSettings {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl std::fmt::Display for CurrentSettings {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
             "\n\
@@ -105,8 +103,7 @@ impl fmt::Display for CurrentSettings {
             Polling Rate: {:?}\n\
             Motion Sync: {:?}\n\
             LOD: {:?}\n\
-            Dongle LED: {:?}
-            \n",
+            Dongle LED: {:?}\n",
             self.dpi, self.polling_rate, self.motion_sync, self.lod, self.dongle_led
         )
     }
