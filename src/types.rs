@@ -1,5 +1,5 @@
-use strum_macros::FromRepr;
 use crate::utils::extract_bits;
+use strum_macros::FromRepr;
 
 pub const VID: u16 = 0x361d;
 pub const PID: u16 = 0x0100;
@@ -37,16 +37,16 @@ pub enum DongleLedOptions {
 
 #[derive(FromRepr, PartialEq, Copy, Clone, Debug)]
 #[repr(u32)]
-pub enum LodOptions {
-    Lod1 = 1 << 13,
-    Lod2 = 1 << 14,
+pub enum MotionSyncOptions {
+    SyncOff = 1 << 13,
+    SyncOn = 1 << 14,
 }
 
 #[derive(FromRepr, PartialEq, Copy, Clone, Debug)]
 #[repr(u32)]
-pub enum MotionSyncOptions {
-    SyncOff = 1 << 15,
-    SyncOn = 1 << 16,
+pub enum LodOptions {
+    Lod1 = 1 << 15,
+    Lod2 = 1 << 16,
 }
 
 pub struct CurrentSettings {
@@ -59,37 +59,33 @@ pub struct CurrentSettings {
 
 impl CurrentSettings {
     pub fn to_u32(&self) -> u32 {
-        let mut result: u32 = 0;
-
-        result |= self.polling_rate as u32;
-        result |= self.dpi as u32;
-        result |= self.dongle_led as u32;
-        result |= self.lod as u32;
-        result |= self.motion_sync as u32;
-
-        result
+        self.polling_rate as u32
+            | self.dpi as u32
+            | self.dongle_led as u32
+            | self.motion_sync as u32
+            | self.lod as u32
     }
 
     pub fn from_u32(code: u32) -> Result<Self, Box<dyn std::error::Error>> {
-        let polling_rate = PollingOptions::from_repr(extract_bits(code, 0, 4))
-            .ok_or_else(|| "Invalid polling rate")?;
+        let polling_rate =
+            PollingOptions::from_repr(extract_bits(code, 0, 4)).ok_or("Invalid polling rate")?;
 
-        let dpi = DpiOptions::from_repr(extract_bits(code, 5, 5)).ok_or_else(|| "Invalid DPI")?;
+        let dpi = DpiOptions::from_repr(extract_bits(code, 5, 5)).ok_or("Invalid DPI")?;
 
-        let dongle_led = DongleLedOptions::from_repr(extract_bits(code, 10, 3))
-            .ok_or_else(|| "Invalid dongle LED")?;
+        let dongle_led =
+            DongleLedOptions::from_repr(extract_bits(code, 10, 3)).ok_or("Invalid dongle LED")?;
 
-        let lod = LodOptions::from_repr(extract_bits(code, 13, 2)).ok_or_else(|| "Invalid LOD")?;
+        let motion_sync =
+            MotionSyncOptions::from_repr(extract_bits(code, 13, 2)).ok_or("Invalid motion sync")?;
 
-        let motion_sync = MotionSyncOptions::from_repr(extract_bits(code, 15, 2))
-            .ok_or_else(|| "Invalid motion sync")?;
+        let lod = LodOptions::from_repr(extract_bits(code, 15, 2)).ok_or("Invalid LOD")?;
 
         Ok(Self {
-            dpi,
             polling_rate,
+            dpi,
+            dongle_led,
             motion_sync,
             lod,
-            dongle_led,
         })
     }
 }
@@ -102,9 +98,9 @@ impl std::fmt::Display for CurrentSettings {
             Polling Rate: {:?}\n\
             DPI: {:?}\n\
             Dongle LED: {:?}\n\
-            LOD: {:?}\n\
-            Dongle LED: {:?}\n",
-            self.dpi, self.polling_rate, self.motion_sync, self.lod, self.dongle_led
+			Motion Sync: {:?}\n\
+            LOD: {:?}\n",
+            self.polling_rate, self.dpi, self.dongle_led, self.motion_sync, self.lod
         )
     }
 }

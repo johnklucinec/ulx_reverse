@@ -56,8 +56,13 @@ fn import_settings(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::erro
     let binary = hex_to_bin(&settings)?;
     device_info.current_settings = CurrentSettings::from_u32(binary)?;
 
-    // Actually do this
-    println!("Mouse settings applied: {}", device_info.current_settings);
+    device_info.set_polling_rate(device_info.current_settings.polling_rate)?;
+    device_info.set_dpi(device_info.current_settings.dpi)?;
+    device_info.set_lod(device_info.current_settings.lod)?;
+    device_info.set_dongle_led(device_info.current_settings.dongle_led)?;
+    device_info.set_motion_sync(device_info.current_settings.motion_sync)?;
+
+    println!("Updated mouse settings: {}", device_info.current_settings);
 
     Ok(())
 }
