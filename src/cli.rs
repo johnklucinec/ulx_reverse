@@ -1,7 +1,6 @@
 use crate::{
     device::{self, DeviceInfo},
     types::*,
-    utils::{bin_to_hex, hex_to_bin},
 };
 use rusb::Context;
 use std::io::{self, Write};
@@ -25,16 +24,23 @@ pub fn run_cli() -> Result<(), Box<dyn std::error::Error>> {
 
         let choice = get_user_input("Enter your choice (1-8): ");
 
-        match choice.as_str() {
-            "1" => import_settings(&mut device_info)?,
-            "2" => export_settings(&mut device_info)?,
-            "3" => change_polling_rate(&mut device_info)?,
-            "4" => change_dpi(&mut device_info)?,
-            "5" => change_dongle_led(&mut device_info)?,
-            "6" => change_lod(&mut device_info)?,
-            "7" => change_motion_sync(&mut device_info)?,
+        let result = match choice.as_str() {
+            "1" => import_settings(&mut device_info),
+            "2" => export_settings(&mut device_info),
+            "3" => change_polling_rate(&mut device_info),
+            "4" => change_dpi(&mut device_info),
+            "5" => change_dongle_led(&mut device_info),
+            "6" => change_lod(&mut device_info),
+            "7" => change_motion_sync(&mut device_info),
             "8" => break,
-            _ => println!("Invalid choice. Please try again."),
+            _ => {
+                println!("Invalid choice. Please try again.");
+                continue;
+            }
+        };
+
+        if let Err(e) = result {
+            println!("{}", e);
         }
     }
     Ok(())
@@ -52,9 +58,9 @@ fn get_user_input(prompt: &str) -> String {
 }
 
 fn import_settings(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::error::Error>> {
-    let settings = get_user_input("Enter the settings code: ");
-    let binary = hex_to_bin(&settings)?;
-    device_info.current_settings = CurrentSettings::from_u32(binary)?;
+    let settings = get_user_input("Enter the settings code (hexadecimal): ");
+    let code = u32::from_str_radix(&settings, 16)?;
+    device_info.current_settings = CurrentSettings::from_u32(code)?;
 
     device_info.set_polling_rate(device_info.current_settings.polling_rate)?;
     device_info.set_dpi(device_info.current_settings.dpi)?;
@@ -68,9 +74,10 @@ fn import_settings(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::erro
 }
 
 fn export_settings(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::error::Error>> {
-    let mouse_settings = device_info.current_settings.to_u32();
-    let settings = bin_to_hex(mouse_settings);
-    println!("Settings from code: {}", settings);
+    let settings = device_info.current_settings.to_hex();
+
+    println!("\nCurrent Mouse Settings: {}", device_info.current_settings);
+    println!("Share Code: {}", settings);
 
     Ok(())
 }
@@ -96,21 +103,24 @@ fn change_polling_rate(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::
 }
 
 fn change_dpi(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::error::Error>> {
-    let dpi = get_user_input("Choose a DPI (1: 400, 2: 800, 3: 1600, 4: 3200, 5: 6400): ");
-    let dpi = match dpi.as_str() {
-        "1" => DpiOptions::Dpi400,
-        "2" => DpiOptions::Dpi800,
-        "3" => DpiOptions::Dpi1600,
-        "4" => DpiOptions::Dpi3200,
-        "5" => DpiOptions::Dpi6400,
-        _ => {
-            println!("Invalid option. Please try again.");
+    let dpi_input = get_user_input("Choose a DPI (400-6400, multiple of 100): ");
+    let dpi_value = match dpi_input.parse::<u16>() {
+        Ok(value) => value,
+        Err(_) => {
+            println!("Invalid input. Please enter a number.");
             return Ok(());
         }
     };
 
-    device_info.set_dpi(dpi)?;
-    println!("DPI updated.");
+    match DpiOption::new(dpi_value) {
+        Ok(dpi_option) => {
+            device_info.set_dpi(dpi_option)?;
+            println!("DPI updated to {}.", dpi_value);
+        }
+        Err(err) => {
+            println!("Invalid DPI value: {}. Please try again.", err);
+        }
+    }
 
     Ok(())
 }

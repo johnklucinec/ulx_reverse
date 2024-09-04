@@ -37,7 +37,7 @@ impl DeviceInfo {
         Ok(())
     }
 
-    pub fn set_dpi(&mut self, dpi: DpiOptions) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn set_dpi(&mut self, dpi: DpiOption) -> Result<(), Box<dyn std::error::Error>> {
         let mut command: Vec<u8> = vec![0u8; 64];
 
         command[0] = 0x04;
@@ -45,28 +45,11 @@ impl DeviceInfo {
         command[2] = 0x90;
         command[3] = 0x02;
 
-        match dpi {
-            DpiOptions::Dpi400 => {
-                command[4] = 0x90;
-                command[5] = 0x01;
-            }
-            DpiOptions::Dpi800 => {
-                command[4] = 0x20;
-                command[5] = 0x03;
-            }
-            DpiOptions::Dpi1600 => {
-                command[4] = 0x40;
-                command[5] = 0x06;
-            }
-            DpiOptions::Dpi3200 => {
-                command[4] = 0x80;
-                command[5] = 0x0c;
-            }
-            DpiOptions::Dpi6400 => {
-                command[4] = 0x00;
-                command[5] = 0x19;
-            }
-        }
+        // Set the DPI bytes directly from the DpiOption
+        command[4] = dpi.low_byte();
+        println!("First bit: {}", command[4]);
+        command[5] = dpi.high_byte();
+        println!("Second bit: {}", command[5]);
 
         // Attempt to process the command
         if let Err(e) = process_command(self, &command) {
@@ -199,11 +182,11 @@ pub fn initialize_device_info(context: &Context) -> Result<DeviceInfo, Box<dyn s
 
     // Initialize with default settings (TODO: Read from device)
     let current_settings = CurrentSettings {
-        dpi: DpiOptions::Dpi1600,
         polling_rate: PollingOptions::Poll4000,
         motion_sync: MotionSyncOptions::SyncOff,
         lod: LodOptions::Lod1,
         dongle_led: DongleLedOptions::LedBattery,
+        dpi: DpiOption::new(1600).unwrap(), // Won't panic.
     };
 
     Ok(DeviceInfo {
