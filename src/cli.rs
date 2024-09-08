@@ -13,7 +13,7 @@ pub fn run_cli() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         println!("\nPlease choose an option:");
-        println!("1. Import a settngs code");
+        println!("1. Import a settings code");
         println!("2. Export a settings code");
         println!("3. Change Polling Rate");
         println!("4. Change DPI");
@@ -40,7 +40,7 @@ pub fn run_cli() -> Result<(), Box<dyn std::error::Error>> {
         };
 
         if let Err(e) = result {
-            println!("{}", e);
+            println!("Failed to process command: {}", e);
         }
     }
     Ok(())
@@ -58,7 +58,7 @@ fn get_user_input(prompt: &str) -> String {
 }
 
 fn import_settings(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::error::Error>> {
-    let settings = get_user_input("Enter the settings code (hexadecimal): ");
+    let settings = get_user_input("Enter the settings code: ");
     let code = u32::from_str_radix(&settings, 16)?;
     device_info.current_settings = CurrentSettings::from_u32(code)?;
 
@@ -68,13 +68,13 @@ fn import_settings(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::erro
     device_info.set_dongle_led(device_info.current_settings.dongle_led)?;
     device_info.set_motion_sync(device_info.current_settings.motion_sync)?;
 
-    println!("Updated mouse settings: {}", device_info.current_settings);
+    println!("\nUpdated mouse settings: {}", device_info.current_settings);
 
     Ok(())
 }
 
 fn export_settings(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::error::Error>> {
-    let settings = device_info.current_settings.to_hex();
+    let settings = device_info.current_settings.to_code();
 
     println!("\nCurrent Mouse Settings: {}", device_info.current_settings);
     println!("Share Code: {}", settings);
@@ -126,7 +126,9 @@ fn change_dpi(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::error::Er
 }
 
 fn change_dongle_led(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::error::Error>> {
-    let dongle_led = get_user_input("Choose a dongle LED (1: Battery, 2: White, 3: Off): ");
+    let dongle_led = get_user_input(
+        "Choose a dongle LED Option (1: Battery Level Indication, 2: Solid White, 3: Off): ",
+    );
     let dongle_led = match dongle_led.as_str() {
         "1" => DongleLedOptions::LedBattery,
         "2" => DongleLedOptions::LedWhite,
@@ -161,7 +163,7 @@ fn change_lod(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::error::Er
 }
 
 fn change_motion_sync(device_info: &mut DeviceInfo) -> Result<(), Box<dyn std::error::Error>> {
-    let motion_sync = get_user_input("Choose a motion sync (1: Off, 2: On): ");
+    let motion_sync = get_user_input("Choose a motion sync option (1: Off, 2: On): ");
     let motion_sync = match motion_sync.as_str() {
         "1" => MotionSyncOptions::SyncOff,
         "2" => MotionSyncOptions::SyncOn,

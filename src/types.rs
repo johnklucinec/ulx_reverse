@@ -1,9 +1,10 @@
 use crate::utils::extract_bits;
 use strum_macros::FromRepr;
 
-pub const VID: u16 = 0x361d;
-pub const PID: u16 = 0x0100;
+pub const VID: u16 = 0x361d; // Vendor ID for Finalmouse
+pub const PID: u16 = 0x0100; // Product ID for ULX Dongle
 pub const COMMAND_ENDPOINT: u8 = 0x01;
+#[cfg(debug_assertions)]
 pub const INTERRUPT_ENDPOINT: u8 = 0x81;
 pub const TIMEOUT: std::time::Duration = std::time::Duration::from_millis(1000);
 
@@ -84,7 +85,7 @@ pub struct CurrentSettings {
 }
 
 impl CurrentSettings {
-    pub fn to_hex(&self) -> String {
+    pub fn to_code(&self) -> String {
         let other_settings = (self.polling_rate as u16)
             | ((self.dongle_led as u16) << 2)
             | ((self.motion_sync as u16) << 4)

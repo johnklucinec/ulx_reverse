@@ -25,11 +25,8 @@ impl DeviceInfo {
             command[4] = 0x01; // This byte turns on Motion Sync
         }
 
-        // Attempt to process the command
-        if let Err(e) = process_command(self, &command) {
-            eprintln!("Failed to process command: {}", e);
-            return Err(e);
-        }
+        // Attempt to process the command and propagate any error
+        process_command(self, &command)?;
 
         // Update the current settings if the command was successful
         self.current_settings.motion_sync = motion_sync;
@@ -47,15 +44,10 @@ impl DeviceInfo {
 
         // Set the DPI bytes directly from the DpiOption
         command[4] = dpi.low_byte();
-        println!("First bit: {}", command[4]);
         command[5] = dpi.high_byte();
-        println!("Second bit: {}", command[5]);
 
-        // Attempt to process the command
-        if let Err(e) = process_command(self, &command) {
-            eprintln!("Failed to process command: {}", e);
-            return Err(e);
-        }
+        // Attempt to process the command and propagate any error
+        process_command(self, &command)?;
 
         // Update the current settings if the command was successful
         self.current_settings.dpi = dpi;
@@ -93,11 +85,8 @@ impl DeviceInfo {
             }
         }
 
-        // Attempt to process the command
-        if let Err(e) = process_command(self, &command) {
-            eprintln!("Failed to process command: {}", e);
-            return Err(e);
-        }
+        // Attempt to process the command and propagate any error
+        process_command(self, &command)?;
 
         // Update the current settings if the command was successful
         self.current_settings.polling_rate = polling_rate;
@@ -122,11 +111,8 @@ impl DeviceInfo {
             }
         }
 
-        // Attempt to process the command
-        if let Err(e) = process_command(self, &command) {
-            eprintln!("Failed to process command: {}", e);
-            return Err(e);
-        }
+        // Attempt to process the command and propagate any error
+        process_command(self, &command)?;
 
         // Update the current settings if the command was successful
         self.current_settings.lod = lod;
@@ -157,11 +143,8 @@ impl DeviceInfo {
             }
         }
 
-        // Attempt to process the command
-        if let Err(e) = process_command(self, &command) {
-            eprintln!("Failed to process command: {}", e);
-            return Err(e);
-        }
+        // Attempt to process the command and propagate any error
+        process_command(self, &command)?;
 
         // Update the current settings if the command was successful
         self.current_settings.dongle_led = led_option;
