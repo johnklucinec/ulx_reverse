@@ -92,8 +92,6 @@ We welcome contributions to ULX-Reverse! If you'd like to contribute, please fol
 4. Push your changes to your fork.
 5. Submit a pull request to the main repository.
 
-Please ensure your code adheres to the project's coding standards and includes appropriate tests.
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
